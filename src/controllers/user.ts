@@ -1,38 +1,27 @@
-import User from "../models/UserModel"
-import bcrypt from "bcrypt";
+import { registerUser } from "../services/user";
 
 const register = async (req: any, res: any) => {
     const body = req.body;
-    const { email, name, password } = body;
 
     try {
-        const isExisted = await User.findOne({ email })
-        if (isExisted) {
-            return res.status(200).json({
-                message: `Tài khoản đã tồn tại`
-            })
+        const user = await registerUser(body);
+        if (user && user.EC === 0) {
+            return res.status(201).json({
+                EC: user.EC,
+                message: user.message,
+                data: user.data
+            });
         }
 
-        const salt = await bcrypt.genSalt(10);
-        const hashPassword = await bcrypt.hash(password, salt);
+        return res.status(400).json({
+            EC: user.EC,
+            message: user.message,
+        });
 
-        body.password = hashPassword;
-
-        const newUser: any = new User(body);
-        await newUser.save();
-
-        delete newUser.password;
-
-        console.log(newUser);
-
-        res.status(201).json({
-            message: "Successfully Registered",
-            data: newUser
-        })
     } catch (error: any) {
-        console.log(error)
-        res.status(404).json({
-            message: error.message
+        console.log("Error register controller: ", error)
+        res.status(500).json({
+            message: error.message || "Internal Server Error"
         })
     }
 }
