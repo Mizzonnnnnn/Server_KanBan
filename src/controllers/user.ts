@@ -1,18 +1,36 @@
-import user from "../models/UserModel"
+import User from "../models/UserModel"
+import bcrypt from "bcrypt";
 
 const register = async (req: any, res: any) => {
     const body = req.body;
-    console.log("Check body: ", body);
+    const { email, name, password } = body;
 
     try {
-        let data = await user.create({ body })
-        console.log("Check data: ", data);
-        res.status.json({
+        const isExisted = await User.findOne({ email })
+        if (isExisted) {
+            return res.status(200).json({
+                message: `Tài khoản đã tồn tại`
+            })
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const hashPassword = await bcrypt.hash(password, salt);
+
+        body.password = hashPassword;
+
+        const newUser: any = new User(body);
+        await newUser.save();
+
+        delete newUser.password;
+
+        console.log(newUser);
+
+        res.status(201).json({
             message: "Successfully Registered",
-            data: body
+            data: newUser
         })
     } catch (error: any) {
-        console.log("Check: ", error)
+        console.log(error)
         res.status(404).json({
             message: error.message
         })
