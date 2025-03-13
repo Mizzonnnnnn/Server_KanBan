@@ -1,15 +1,23 @@
 import { registerUser } from "../services/user";
+import { getAccesstoken } from "../utils/getAccesstoken";
 
 const register = async (req: any, res: any) => {
     const body = req.body;
 
     try {
         const user = await registerUser(body);
+
         if (user && user.EC === 0) {
+            const token = await getAccesstoken({
+                _id: user.data._id,
+                email: user.data.email,
+                rule: 1
+            })
+
             return res.status(201).json({
                 EC: user.EC,
                 message: user.message,
-                data: user.data
+                data: { ...user.data, token }
             });
         }
 
