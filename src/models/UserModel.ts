@@ -8,11 +8,14 @@ const UserScheme = new Schema({
     email: {
         type: String,
         required: true
-
     },
     password: {
         type: String,
         required: true
+    },
+    rule: {
+        type: Number,
+        default: 1
     }
 }, { timestamps: true })
 
