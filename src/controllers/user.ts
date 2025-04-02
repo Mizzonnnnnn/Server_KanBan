@@ -28,8 +28,8 @@ const register = async (req: any, res: any) => {
 
     } catch (error: any) {
         console.log("Error register controller: ", error)
-        res.status(500).json({
-            message: error.message || "Internal Server Error"
+        res.status(400).json({
+            message: error.message
         })
     }
 }
@@ -40,7 +40,7 @@ const login = async (req: any, res: any) => {
     try {
         const user = await loginUser(body);
 
-        if (user.data) {
+        if (user && user.EC === 0) {
             const token = await getAccesstoken({
                 _id: user.data._id,
                 email: user.data.email,
@@ -59,8 +59,8 @@ const login = async (req: any, res: any) => {
 
     } catch (error: any) {
         console.log("Error register controller: ", error)
-        res.status(40).json({
-            message: error.message || "Internal Server Error"
+        res.status(400).json({
+            message: error.message
         })
     }
 }

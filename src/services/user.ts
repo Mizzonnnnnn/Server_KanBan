@@ -65,29 +65,27 @@ const loginUser = async (data: UserData) => {
         const user = await User.findOne({ email });
 
         if (!user) {
-            return {
-                message: "Taì khoản không tồn tại",
-            }
+            return { EC: 1, message: "Taì khoản không tồn tại" }
         }
 
         const pw = await bcrypt.compare(password, user.password);
 
         if (!pw) {
-            return {
-                message: "Password sai sai saiisaiisiiasiifdisa",
-            }
+            return { EC: 1, message: "Đăng nhập thất bại, vui lòng kiểm tra lại Email/Password " }
         }
 
         const objectUser: any = user.toObject();
         delete objectUser.password;
 
         return {
+            EC: 0,
             message: "Successfully Login",
             data: objectUser
         }
     } catch (error: any) {
         console.log('Error register service: ', error);
         return {
+            EC: -1,
             message: "Something wrongs in service resgister",
         }
     }
