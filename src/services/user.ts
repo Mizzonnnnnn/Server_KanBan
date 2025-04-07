@@ -1,5 +1,6 @@
 import User from "../models/UserModel"
 import bcrypt from "bcrypt";
+import { generatorRandomText } from "../utils/generatorRandomText";
 
 interface UserData {
     email: string,
@@ -8,7 +9,7 @@ interface UserData {
 }
 
 const isExisted = async (email: string) => {
-    const isExisted = await User.findOne({ email })
+    const isExisted: any = await User.findOne({ email })
     return !!isExisted;
 }
 
@@ -91,4 +92,45 @@ const loginUser = async (data: UserData) => {
     }
 }
 
-export { registerUser, loginUser };
+const loginUserGoogle = async (data: UserData) => {
+    const { email, password } = data;
+
+    try {
+        const Existed = await isExisted(email);
+        console.log("Check: ", Existed)
+        if (Existed) {
+            return {
+                EC: 0,
+                message: "Successfully Login",
+                data: Existed
+            }
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const hashPassword = await bcrypt.hash(generatorRandomText(6), salt);
+        data.password = hashPassword;
+
+        const newUser: any = new User(data);
+        await newUser.save();
+
+        // chuyển thành đối tượng js thuần túy để không còn bị moogose quản lý
+        const userObject = newUser.toObject();
+
+        // xóa đi pw khi thông báo thông tintin
+        delete userObject.password;
+
+        return {
+            EC: 0,
+            message: "Successfully Login",
+            data: userObject
+        }
+
+    } catch (error: any) {
+        console.log('Error login service: ', error);
+        return {
+            EC: -1,
+            message: "Something wrongs in service login with google",
+        }
+    }
+}
+export { registerUser, loginUser, loginUserGoogle };

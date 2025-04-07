@@ -5,6 +5,6 @@ export const getAccesstoken = (payload: {
     email: string;
     rule: number;
 }) => {
-    const token = jwt.sign(payload, process.env.SECRET_KEY as string, { expiresIn: 60 })
+    const token = jwt.sign(payload, process.env.SECRET_KEY as string, { expiresIn: '1d' })
     return token;
 }
