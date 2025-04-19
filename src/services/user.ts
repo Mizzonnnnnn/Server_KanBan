@@ -10,7 +10,7 @@ interface UserData {
 
 const isExisted = async (email: string) => {
     const isExisted: any = await User.findOne({ email })
-    return !!isExisted;
+    return isExisted;
 }
 
 const hashPw = async (password: string) => {
@@ -93,16 +93,18 @@ const loginUser = async (data: UserData) => {
 }
 
 const loginUserGoogle = async (data: UserData) => {
-    const { email, password } = data;
-
+    const { email } = data;
     try {
-        const Existed = await isExisted(email);
-        console.log("Check: ", Existed)
+        const Existed: any = await isExisted(email);
+
         if (Existed) {
+            const user: any = Existed.toObject();
+            delete user.password;
+
             return {
                 EC: 0,
                 message: "Successfully Login",
-                data: Existed
+                data: user
             }
         }
 
@@ -113,10 +115,7 @@ const loginUserGoogle = async (data: UserData) => {
         const newUser: any = new User(data);
         await newUser.save();
 
-        // chuyển thành đối tượng js thuần túy để không còn bị moogose quản lý
         const userObject = newUser.toObject();
-
-        // xóa đi pw khi thông báo thông tintin
         delete userObject.password;
 
         return {
@@ -129,7 +128,7 @@ const loginUserGoogle = async (data: UserData) => {
         console.log('Error login service: ', error);
         return {
             EC: -1,
-            message: "Something wrongs in service login with google",
+            message: "Lỗi đăng nhập với Google !!!",
         }
     }
 }

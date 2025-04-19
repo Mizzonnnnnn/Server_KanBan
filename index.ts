@@ -17,6 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 // config middware cors
 app.use(corsMiddleware);
 
+
 // router auth login and register
 app.use('/auth', userRouter)
 

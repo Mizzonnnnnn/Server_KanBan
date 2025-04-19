@@ -46,7 +46,7 @@ const login = async (req: any, res: any) => {
                 email: user.data.email,
                 rule: user.data.rule ?? 1
             })
-
+            console.log(user)
             return res.status(201).json({
                 message: user.message,
                 data: { ...user.data, token }
@@ -68,7 +68,6 @@ const login = async (req: any, res: any) => {
 
 const loginWithGoogle = async (req: any, res: any) => {
     const body = req.body;
-
     try {
         const user = await loginUserGoogle(body);
 
@@ -76,11 +75,10 @@ const loginWithGoogle = async (req: any, res: any) => {
             const token = await getAccesstoken({
                 _id: user.data._id,
                 email: user.data.email,
-                rule: 1
+                rule: user.data.rule ?? 1
             })
-
+            // console.log(user)
             return res.status(201).json({
-                EC: user.EC,
                 message: user.message,
                 data: { ...user.data, token }
             });
